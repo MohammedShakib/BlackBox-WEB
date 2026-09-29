@@ -1,10 +1,12 @@
 import { CircleFtpProvider } from './circleftp';
+import { InternetArchiveProvider } from './internetarchive';
 import { Provider } from './types';
 
 export * from './types';
 
 export const providers: Record<string, Provider> = {
   [CircleFtpProvider.id]: CircleFtpProvider,
+  [InternetArchiveProvider.id]: InternetArchiveProvider,
 };
 
 export function getProvider(id: string): Provider {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import ServerStatusIndicator from './ServerStatusIndicator';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,6 +38,7 @@ export default function Navbar() {
         <div className="nav-right">
           <Link href="/search" className="nav-link">Search</Link>
           <div className="nav-link">Profile</div>
+          <ServerStatusIndicator />
         </div>
       </div>
     </nav>

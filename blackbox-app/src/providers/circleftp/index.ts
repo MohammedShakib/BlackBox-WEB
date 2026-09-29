@@ -59,7 +59,7 @@ export const CircleFtpProvider: Provider = {
     ];
 
     const results = [];
-    for (const cat of categories) {
+    const promises = categories.map(async (cat) => {
       try {
         const data = await fetchApi(`/api/posts?categoryExact=${cat.id}&page=1&order=desc&limit=15`, 3600);
         const items: MediaItem[] = (data.posts || []).filter((p: any) => p.type === 'singleVideo' || p.type === 'series').map((post: any) => ({
@@ -71,13 +71,16 @@ export const CircleFtpProvider: Provider = {
           type: post.type === 'singleVideo' ? 'movie' : 'series',
         }));
         if (items.length > 0) {
-          results.push({ title: cat.name, items });
+          return { title: cat.name, items };
         }
       } catch (err) {
-        console.error(`Failed to fetch category ${cat.name}`, err);
+        console.error(`Failed to fetch category ${cat.name}`);
       }
-    }
-    return results;
+      return null;
+    });
+
+    const resolved = await Promise.all(promises);
+    return resolved.filter(r => r !== null) as { title: string; items: MediaItem[] }[];
   },
 
   search: async (query: string) => {

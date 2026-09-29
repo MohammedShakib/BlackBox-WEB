@@ -45,7 +45,12 @@ export default function Player({ streams, title }: PlayerProps) {
         hls.attachMedia(video);
         
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          video.play().catch(console.error);
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((e) => {
+              if (e.name !== 'AbortError') console.error(e);
+            });
+          }
         });
 
         hls.on(Hls.Events.ERROR, (event, data) => {
@@ -70,13 +75,23 @@ export default function Player({ streams, title }: PlayerProps) {
         // Safari native support
         video.src = stream.url;
         video.addEventListener('loadedmetadata', () => {
-          video.play().catch(console.error);
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((e) => {
+              if (e.name !== 'AbortError') console.error(e);
+            });
+          }
         });
       }
     } else {
       // MP4 or other native
       video.src = stream.url;
-      video.play().catch(console.error);
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((e) => {
+          if (e.name !== 'AbortError') console.error(e);
+        });
+      }
     }
 
     const handleNativeError = () => {

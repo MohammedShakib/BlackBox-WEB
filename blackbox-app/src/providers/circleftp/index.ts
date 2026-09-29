@@ -5,18 +5,28 @@ const BACKUP_API_URL = 'http://15.1.1.50:5000';
 
 async function fetchApi(endpoint: string, cacheTime: number = 3600) {
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  
+  const fetchWithTimeout = async (url: string) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 4000); // 4 second timeout
+    try {
+      const res = await fetch(url, {
+        next: { revalidate: cacheTime },
+        signal: controller.signal
+      });
+      clearTimeout(id);
+      if (!res.ok) throw new Error('Failed to fetch');
+      return await res.json();
+    } catch (err) {
+      clearTimeout(id);
+      throw err;
+    }
+  };
+
   try {
-    const res = await fetch(`${MAIN_API_URL}${cleanEndpoint}`, {
-      next: { revalidate: cacheTime },
-    });
-    if (!res.ok) throw new Error('Failed to fetch from main API');
-    return await res.json();
+    return await fetchWithTimeout(`${MAIN_API_URL}${cleanEndpoint}`);
   } catch (error) {
-    const res = await fetch(`${BACKUP_API_URL}${cleanEndpoint}`, {
-      next: { revalidate: cacheTime },
-    });
-    if (!res.ok) throw new Error('Failed to fetch from backup API');
-    return await res.json();
+    return await fetchWithTimeout(`${BACKUP_API_URL}${cleanEndpoint}`);
   }
 }
 

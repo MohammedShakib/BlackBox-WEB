@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import './detail.css'; // We will create this
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export default async function TitleDetail({
   params,
